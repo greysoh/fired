@@ -36,8 +36,8 @@ const optionSelect: number = await ask("Select an option: ", [
 
 switch (optionSelect) {
   case 0: {
-    const profiles = await getFirefoxProfiles();
-    let json = [];
+    const profiles: any = await getFirefoxProfiles();
+    let json: {}[] = [];
 
     for (const i of Object.keys(profiles)) {
       if (!profiles[i].Name) continue;
@@ -54,7 +54,12 @@ switch (optionSelect) {
     const profile = await ask("Select a profile: ", json);
 
     console.log("Please enter a new profile name: ");
-    const newName = prompt(">");
+    const newName: string = prompt(">") || "";
+
+    if (newName == "") {
+      console.log("You must enter a new profile name, dummy.");
+      break;
+    }
 
     profiles[profile].Name = newName;
     console.log(`\nBacking up profile '${profiles[profile].Name}'...`);
@@ -100,13 +105,13 @@ switch (optionSelect) {
     ok();
     printf(`  - Adding metadata... `);
 
-    let metadata = profiles[profile];
+    let metadata: any = profiles[profile];
     delete metadata.Default;
 
     await Deno.writeTextFile(
       path.join(
         osLib.tempDir(),
-        `firefox-backup-${profiles[profile].Name}-src`,
+        `firefox-backup-${metadata.Name}-src`,
         "metadata.json"
       ),
       JSON.stringify(metadata)
@@ -118,9 +123,9 @@ switch (optionSelect) {
     await osLib.zip(
       path.join(
         osLib.tempDir(),
-        `firefox-backup-${profiles[profile].Name}-src`
+        `firefox-backup-${metadata.Name}-src`
       ),
-      path.join(osLib.homeDir(), `firefox-backup-${profiles[profile].Name}.zip`)
+      path.join(osLib.homeDir(), `firefox-backup-${metadata.Name}.zip`)
     );
 
     ok();
@@ -129,7 +134,7 @@ switch (optionSelect) {
     await Deno.remove(
       path.join(
         osLib.tempDir(),
-        `firefox-backup-${profiles[profile].Name}-src`
+        `firefox-backup-${metadata.Name}-src`
       ),
       { recursive: true }
     );
@@ -138,16 +143,16 @@ switch (optionSelect) {
 
     console.log("\nDone! Your backup is at:");
     console.log(
-      path.join(osLib.homeDir(), `firefox-backup-${profiles[profile].Name}.zip`)
+      path.join(osLib.homeDir(), `firefox-backup-${metadata.Name}.zip`)
     );
     break;
   }
 
   case 1: {
-    const profiles = await getFirefoxProfiles();
+    const profiles: any = await getFirefoxProfiles();
 
     console.log("Please enter the path to the backup file: \n");
-    const backupFile = (await prompt(">")) || "";
+    const backupFile: string = await prompt(">") || "";
 
     if (!existsSync(backupFile)) {
       console.error("File not found.");
@@ -199,14 +204,16 @@ switch (optionSelect) {
 
     printf("  - Restoring backup... ");
 
-    if (existsSync(path.join(getFirefoxDir(), metadata.Path + "-restore"))) {
+    const newPath: string = metadata.Path + "-restore";
+
+    if (existsSync(path.join(getFirefoxDir(), newPath))) {
       await Deno.remove(
-        path.join(getFirefoxDir(), metadata.Path + "-restore"),
+        path.join(getFirefoxDir(), newPath),
         { recursive: true }
       );
     }
 
-    await Deno.mkdir(path.join(getFirefoxDir(), metadata.Path + "-restore"));
+    await Deno.mkdir(path.join(getFirefoxDir(), newPath));
 
     await osLib.unzip(
       path.join(
@@ -214,7 +221,7 @@ switch (optionSelect) {
         `${path.basename(backupFile)}-src`,
         "backup.zip"
       ),
-      path.join(getFirefoxDir(), metadata.Path + "-restore")
+      path.join(getFirefoxDir(), newPath)
     );
 
     ok();
@@ -265,10 +272,8 @@ switch (optionSelect) {
     ok();
 
     console.log(
-      "\nDone! You should see a prompt asking you to select a profile."
-    );
-    console.log(
-      "Configure it as you please. If you are on macOS, you will see an error, as I haven't figured out macOS yet."
+      "\nDone! You should see a prompt asking you to select a profile.",
+      "\nConfigure it as you please."
     );
 
     await openFirefoxProfileChooser();
