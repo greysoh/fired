@@ -57,7 +57,7 @@ export async function zip(source: string, dest: string): Promise<{}> {
 }
 
 /**
- *
+ * Unzips file and extracts to destination
  * @param source The source path to the zip file to unzip
  * @param dest The destination path to unzip the zip file to
  * @returns Success or failure
