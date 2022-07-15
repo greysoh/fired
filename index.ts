@@ -167,8 +167,6 @@ switch (optionSelect) {
     backupFile = backupFile.replaceAll('"', "");
 
     backupFile = backupFile.trim(); // wtf?
-
-    console.log(backupFile);
     
     if (!existsSync(backupFile)) {
       console.error("File not found.");
