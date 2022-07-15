@@ -3,6 +3,7 @@ import {
   getFirefoxDir,
   setFirefoxProfiles,
   openFirefoxProfileChooser,
+  fixOSPath
 } from "./firefoxLib.ts";
 import { ask } from "./promptLib.ts";
 import * as osLib from "./osLib.ts";
@@ -164,6 +165,10 @@ switch (optionSelect) {
     let backupFile: string = await prompt(">") || "";
     backupFile = backupFile.replaceAll("'", "");
     backupFile = backupFile.replaceAll('"', "");
+
+    backupFile = backupFile.trim(); // wtf?
+
+    console.log(backupFile);
     
     if (!existsSync(backupFile)) {
       console.error("File not found.");
@@ -215,7 +220,7 @@ switch (optionSelect) {
 
     printf("  - Restoring backup... ");
 
-    const newPath: string = metadata.Path + "-restore";
+    const newPath: string = fixOSPath(metadata.Path + "-restore");
 
     if (existsSync(path.join(getFirefoxDir(), newPath))) {
       await Deno.remove(
@@ -262,7 +267,7 @@ switch (optionSelect) {
 
     metaName = "Profile" + (Math.max(...itemArr) + 1);
 
-    metadata.Path += "-restore";
+    metadata.Path = fixOSPath(metadata.Path + "-restore");
     profilesModify[metaName] = metadata;
 
     const profilesIni = setFirefoxProfiles(profilesModify);

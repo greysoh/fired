@@ -40,3 +40,14 @@ export async function openFirefoxProfileChooser(): Promise<void> {
     await runShell("firefox -P", false);
   }
 }
+
+
+export function fixOSPath(path: string): string {
+  if (os.platform() == "windows" && !path.startsWith("Profiles/")) {
+    return "Profiles/" + path;
+  } else if (path.startsWith("Profiles/")) {
+    return path.replace("Profiles/", "");
+  } else {
+    return path;
+  }
+}
