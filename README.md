@@ -1,4 +1,4 @@
-# Fired (Firefox Dumper) v0.1.0a
+# Fired (Firefox Dumper) v0.1.1
 Tool to backup and restore Firefox profiles.
 ## Demo
 | Dumping     | Restoring   |
