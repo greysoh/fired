@@ -161,8 +161,10 @@ switch (optionSelect) {
     const profiles: any = await getFirefoxProfiles();
 
     console.log("Please enter the path to the backup file: \n");
-    const backupFile: string = await prompt(">") || "";
-
+    let backupFile: string = await prompt(">") || "";
+    backupFile = backupFile.replaceAll("'", "");
+    backupFile = backupFile.replaceAll('"', "");
+    
     if (!existsSync(backupFile)) {
       console.error("File not found.");
       Deno.exit(1);
