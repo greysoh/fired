@@ -20,7 +20,9 @@ if (os.platform() == "darwin") {
   Deno.exit(1);
 }
 
-console.log("Fired - The all in one Firefox profile backup/restore tool.\n");
+const version = "0.1.0a";
+
+console.log(`Fired v${version} - The all in one Firefox profile backup/restore tool.\n`);
 
 function ok(): void {
   printf(`[${colors.bold(colors.green("OK"))}]\n`);
