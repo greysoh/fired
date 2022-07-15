@@ -13,6 +13,13 @@ import * as colors from "https://deno.land/std@0.72.0/fmt/colors.ts";
 import * as path from "https://deno.land/std@0.147.0/path/mod.ts";
 import { existsSync } from "https://deno.land/std/fs/mod.ts";
 
+import os from "https://deno.land/x/dos@v0.11.0/mod.ts";
+
+if (os.platform() == "darwin") {
+  console.log("macOS is currently not supported.");
+  Deno.exit(1);
+}
+
 console.log("Fired - The all in one Firefox profile backup/restore tool.\n");
 
 function ok(): void {
