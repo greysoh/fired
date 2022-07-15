@@ -43,7 +43,7 @@ export async function zip(source: string, dest: string): Promise<{}> {
   if (platform == "windows") {
     let file = `@echo off\n`;
     file += `cd /d "${source}"\n`;
-    file += `tar -a -c -f ${dest} *`;
+    file += `tar -a -c -f "${dest}" *`;
 
     await Deno.writeTextFile(os.tempDir() + "/zip.bat", file);
     const run = await runShell(os.tempDir() + "/zip.bat", false);
@@ -51,7 +51,14 @@ export async function zip(source: string, dest: string): Promise<{}> {
 
     return run;
   } else {
-    const run = await runShell(`zip -r "${dest}" "${source}"`, false);
+    let file = `#!/bin/bash\n`;
+    file += `cd "${source}"\n`;
+    file += `zip -qq "${dest}" *`;
+
+    await Deno.writeTextFile("/tmp/zip", file);
+    const run = await runShell("bash /tmp/zip", false);
+    await Deno.remove("/tmp/zip");
+    
     return run;
   }
 }
@@ -65,12 +72,25 @@ export async function zip(source: string, dest: string): Promise<{}> {
 export async function unzip(source: string, dest: string): Promise<{}> {
   const platform = os.platform();
 
-  if (platform == "windows") {
-    const run = await runShell(`cmd /c tar.exe -x -f ${source} -C ${dest}`, false);
-    return run;
-  } else {
-    const run = await runShell(`unzip -o "${source}" -d "${dest}"`, false);
-    return run;
+  try {
+    if (platform == "windows") {
+      const run = await runShell(
+        `cmd /c tar.exe -x -f "${source}" -C "${dest}"`,
+        false
+      );
+      return run;
+    } else {
+      let file = `#!/bin/bash\n`;
+      file += `unzip -qq "${source}" -d "${dest}"`;
+
+      await Deno.writeTextFile("/tmp/unzip", file);
+      const run = await runShell("bash /tmp/unzip", false);
+      await Deno.remove("/tmp/unzip");
+
+      return run;
+    }
+  } catch (_e) {
+    throw "Unzip is not installed";
   }
 }
 
@@ -105,7 +125,7 @@ export async function killAll(process: string): Promise<{}> {
  * Fix to make TypeScript happy. Don't @ me.
  */
 export function tempDir(): string {
-  return os.tempDir() || "";
+  return os.tempDir() || "/tmp/";
 }
 
 /**

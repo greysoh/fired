@@ -228,8 +228,8 @@ switch (optionSelect) {
 
     printf("  - Fixing metadata...  ");
 
-    let metaName: string = "";
-    let itemArr: number[] = [];
+    let metaName = "";
+    const itemArr: number[] = [];
 
     for (const i of Object.keys(profiles)) {
       if (i.startsWith("Profile")) {

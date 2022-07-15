@@ -32,11 +32,11 @@ export async function openFirefoxProfileChooser(): Promise<void> {
     file += "firefox.exe -P";
 
     await Deno.writeTextFile(os.tempDir() + "/firefox.bat", file);
-    const run = await runShell(os.tempDir() + "/firefox.bat", false);
+    await runShell(os.tempDir() + "/firefox.bat", false);
     await Deno.remove(os.tempDir() + "/firefox.bat");
   } else if (os.platform() == "darwin") {
     throw "macOS is not supported";
   } else {
-    const run = await runShell("firefox -P", false);
+    await runShell("firefox -P", false);
   }
 }
